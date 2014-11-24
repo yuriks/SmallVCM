@@ -41,7 +41,6 @@
 #include "vertexcm.hxx"
 #include "html_writer.hxx"
 
-#include <omp.h>
 #include <string>
 #include <set>
 #include <sstream>

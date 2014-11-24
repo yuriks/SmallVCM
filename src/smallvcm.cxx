@@ -39,7 +39,6 @@
 #include "html_writer.hxx"
 #include "config.hxx"
 
-#include <omp.h>
 #include <string>
 #include <set>
 #include <sstream>
@@ -51,9 +50,6 @@ float render(
     const Config &aConfig,
     int *oUsedIterations = NULL)
 {
-    // Set number of used threads
-    omp_set_num_threads(aConfig.mNumThreads);
-
     // Create 1 renderer per thread
     typedef AbstractRenderer* AbstractRendererPtr;
     AbstractRendererPtr *renderers;
@@ -75,23 +71,20 @@ float render(
     if(aConfig.mMaxTime > 0)
     {
         // Time based loop
-#pragma omp parallel
         while(clock() < startT + aConfig.mMaxTime*CLOCKS_PER_SEC)
         {
-            int threadId = omp_get_thread_num();
+            int threadId = 0;
             renderers[threadId]->RunIteration(iter);
 
-#pragma omp atomic
             iter++; // counts number of iterations
         }
     }
     else
     {
         // Iterations based loop
-#pragma omp parallel for
         for(iter=0; iter < aConfig.mIterations; iter++)
         {
-            int threadId = omp_get_thread_num();
+            int threadId = 0;
             renderers[threadId]->RunIteration(iter);
         }
     }
@@ -264,7 +257,7 @@ int main(int argc, const char *argv[])
 
     // If number of threads is invalid, set 1 thread per processor
     if(config.mNumThreads <= 0)
-        config.mNumThreads  = std::max(1, omp_get_num_procs());
+        config.mNumThreads  = 1;
 
     if(config.mFullReport)
     {

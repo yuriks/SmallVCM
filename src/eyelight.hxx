@@ -27,7 +27,6 @@
 
 #include <vector>
 #include <cmath>
-#include <omp.h>
 #include "renderer.hxx"
 #include "rng.hxx"
 
